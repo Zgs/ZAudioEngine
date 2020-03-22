@@ -5,27 +5,10 @@ using UnityEngine;
 
 namespace AudioEngine
 {
-    public class AudioEngine : MonoBehaviour
+    public class AudioEngine : SingletonMono<AudioEngine>
     {
-        private static AudioEngine _instance;
-
-        public static AudioEngine Instance
-        {
-            get
-            {
-                _instance = FindObjectOfType<AudioEngine>();
-                if (_instance == null)
-                {
-                    var gameObj = new GameObject("Audio Engine");
-                    _instance = gameObj.AddComponent<AudioEngine>();
-                }
-
-                return _instance;
-            }
-        }
-
-        private Dictionary<int, Channel> _channelMap = new Dictionary<int, Channel>();
-        private List<int> _stopChannel = new List<int>();
+        private readonly Dictionary<int, Channel> _channelMap = new Dictionary<int, Channel>();
+        private readonly List<int> _stopChannel = new List<int>();
         private int _channelId;
 
         private void Update()

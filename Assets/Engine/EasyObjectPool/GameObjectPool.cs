@@ -1,82 +1,114 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public class GameObjectPool
+namespace AudioEngine
 {
-    public Dictionary<string, Pool> PoolDict = new Dictionary<string, Pool>();
-
-    public void CreatePool(string poolName, GameObject poolObj, int initSize, int maxSize)
+    public class GameObjectPool : SingletonMono<GameObjectPool>
     {
-        if (PoolDict.ContainsKey(poolName))
+        public Dictionary<string, Pool> PoolDict = new Dictionary<string, Pool>();
+
+        public void CreatePool(string poolName, GameObject poolObj, int initSize)
         {
-            Debug.LogWarning($"PoolName {poolName} is already exist!!!");
-            return;
+            if (PoolDict.ContainsKey(poolName))
+            {
+                Debug.LogWarning($"PoolName {poolName} is already exist!!!");
+                return;
+            }
+
+            var pool = new Pool(poolName, poolObj, initSize, gameObject);
+            PoolDict.Add(poolName, pool);
         }
 
-        var pool = new Pool(poolName, poolObj, initSize, maxSize);
-        PoolDict.Add(poolName, pool);
-    }
-
-    public GameObject GetNext(string poolName)
-    {
-        if (!PoolDict.ContainsKey(poolName))
+        public GameObject GetNext(string poolName)
         {
-            Debug.LogWarning($"PoolName {poolName} is not exist!!!");
-            return null;
+            if (!PoolDict.ContainsKey(poolName))
+            {
+                Debug.LogWarning($"PoolName {poolName} is not exist!!!");
+                return null;
+            }
+
+            var pool = PoolDict[poolName];
+            return pool.GetNextItem();
         }
 
-        var pool = PoolDict[poolName];
-        return pool.GetNextItem();
-    }
-
-    public void ReturnToPool(GameObject gameObject)
-    {
-        var poolName = gameObject.GetComponent<PoolTag>().PoolName;
-        var pool = PoolDict[poolName];
-        pool.ReturnToQueue(gameObject);
-    }
-}
-
-public class Pool
-{
-    public string PoolName;
-    public GameObject PoolObj;
-    public int InitSize;
-    public int MaxSize;
-    private Queue<GameObject> _queue;
-
-    public Pool(string poolName, GameObject poolObj, int initSize, int maxSize)
-    {
-        PoolName = poolName;
-        var poolTag = poolObj.AddComponent<PoolTag>();
-        poolTag.PoolName = poolName;
-        PoolObj = poolObj;
-        InitSize = initSize;
-        MaxSize = Math.Max(initSize, maxSize);
-        _queue = new Queue<GameObject>(MaxSize);
-        for (var i = 0; i < initSize; i++)
+        public void ReturnToPool(GameObject gameObj)
         {
-            var gameObject = Object.Instantiate(poolObj);
-            gameObject.SetActive(false);
-            _queue.Enqueue(gameObject);
+            var poolName = gameObj.GetComponent<PoolTag>().PoolName;
+            var pool = PoolDict[poolName];
+            pool.ReturnToQueue(gameObj);
         }
     }
 
-    public GameObject GetNextItem()
+
+    public class Pool
     {
-        return null;
+        private int _availableCount;
+        private readonly string _poolName;
+        private readonly GameObject _poolObj;
+        private readonly GameObject _poolObjRoot;
+        private readonly Queue<GameObject> _queue;
+
+        public Pool(string poolName, GameObject poolObj, int initSize, GameObject rootObj)
+        {
+            _poolObjRoot = new GameObject(poolName);
+            _poolObjRoot.transform.SetParent(rootObj.transform);
+            _poolName = poolName;
+            _poolObj = poolObj;
+            _queue = new Queue<GameObject>();
+            for (var i = 0; i < initSize; i++)
+            {
+                var gameObject = Object.Instantiate(poolObj, _poolObjRoot.transform, true);
+                gameObject.SetActive(false);
+                gameObject.transform.localPosition = Vector3.zero;
+                _queue.Enqueue(gameObject);
+            }
+
+            _availableCount = initSize;
+        }
+
+        public GameObject GetNextItem()
+        {
+            GameObject ret;
+            if (_availableCount > 0)
+            {
+                ret = _queue.Dequeue();
+                _availableCount -= 1;
+                ret.SetActive(true);
+            }
+            else
+            {
+                ret = Object.Instantiate(_poolObj);
+            }
+
+            if (ret)
+            {
+                ret.SetActive(true);
+                var tag = ret.GetComponent<PoolTag>();
+                if (tag == null)
+                {
+                    tag = ret.AddComponent<PoolTag>();
+                }
+
+                tag.PoolName = _poolName;
+                ret.transform.SetParent(null);
+            }
+
+            return ret;
+        }
+
+        public void ReturnToQueue(GameObject item)
+        {
+            _queue.Enqueue(item);
+            item.transform.SetParent(_poolObjRoot.transform);
+            item.transform.localPosition = Vector3.zero;
+            item.SetActive(false);
+            _availableCount += 1;
+        }
     }
 
-    public void ReturnToQueue(GameObject item)
+    public class PoolTag : MonoBehaviour
     {
-        _queue.Enqueue(item);
+        public string PoolName;
     }
-}
-
-public class PoolTag : MonoBehaviour
-{
-    public string PoolName;
 }
