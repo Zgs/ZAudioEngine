@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace AudioEngine
@@ -8,8 +6,14 @@ namespace AudioEngine
     public class AudioEngine : SingletonMono<AudioEngine>
     {
         private readonly Dictionary<int, Channel> _channelMap = new Dictionary<int, Channel>();
-        private readonly List<int> _stopChannel = new List<int>();
+        [SerializeField] private GameObject _audioPrefab;
         private int _channelId;
+
+
+        private void Start()
+        {
+            GameObjectPool.Instance.CreatePool("Audio", _audioPrefab, 20);
+        }
 
         private void Update()
         {
@@ -17,31 +21,32 @@ namespace AudioEngine
             foreach (var key in keys)
             {
                 var channel = _channelMap[key];
-                if (!channel.IsPlaying)
-                {
-                    _stopChannel.Add(key);
-                }
+                channel.Update();
             }
 
-            for (var i = 0; i < _stopChannel.Count; i++)
-            {
-                var id = _stopChannel[i];
-                _channelMap.Remove(id);
-            }
+            // for (var i = 0; i < _stopChannel.Count; i++)
+            // {
+            //     var id = _stopChannel[i];
+            //     _channelMap.Remove(id);
+            // }
+            // _stopChannel.Clear();
         }
 
-        private void LateUpdate()
-        {
-            _stopChannel.Clear();
-        }
-
-        public int PlaySound(string eventName, Vector3 pos, float volume)
+        public int PlaySound(string eventName, Vector3? pos, float volume = 0.5f)
         {
             var nextId = _channelId++;
             var channel = new Channel();
             channel.Setup(eventName, pos, volume);
+            channel.EnterState("Initialize");
             _channelMap.Add(nextId, channel);
             return nextId;
+        }
+
+        public void StopSound(int id)
+        {
+            var channel = _channelMap[id];
+            channel.EnterState("Stopping");
+            _channelMap.Remove(id);
         }
     }
 }
