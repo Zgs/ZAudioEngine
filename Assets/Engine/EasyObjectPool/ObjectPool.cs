@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class ObjectPool
 {
-    public static ObjectPool _instance;
+    private static ObjectPool _instance;
 
     public static ObjectPool Instance
     {
@@ -35,20 +34,27 @@ public class ObjectPool
         {
             queue.Enqueue(new T());
         }
+
         _poolDict.Add(poolName, queue);
     }
 
     public T GetNext<T>() where T : new()
     {
-        //string poolName = typeof(T).Name;
-        // Pool pool = _poolDict[poolName];
+        string poolName = typeof(T).Name;
+        var queue = _poolDict[poolName];
+        if (queue.Count > 0)
+        {
+            return (T) queue.Dequeue();
+        }
+
         return new T();
     }
 
     public void ReturnToPool<T>(T obj)
     {
-        //string poolName = typeof(T).Name;
-        //Pool pool = _poolDict[poolName];
+        string poolName = typeof(T).Name;
+        var queue = _poolDict[poolName];
+        queue.Enqueue(obj);
         //pool.ReturnToPool(obj);
     }
 }

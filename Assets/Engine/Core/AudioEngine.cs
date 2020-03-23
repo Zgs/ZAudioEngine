@@ -13,6 +13,7 @@ namespace AudioEngine
         private void Start()
         {
             GameObjectPool.Instance.CreatePool("Audio", _audioPrefab, 20);
+            ObjectPool.Instance.CreatePool<Channel>(20);
             Loader = new ResourcesLoader();
         }
 
@@ -36,7 +37,7 @@ namespace AudioEngine
         public int PlaySound(string eventName, Vector3? pos, float volume = 0.5f)
         {
             var nextId = _channelId++;
-            var channel = new Channel();
+            var channel = ObjectPool.Instance.GetNext<Channel>();
             channel.Setup(eventName, pos, volume);
             channel.EnterState("Initialize");
             _channelMap.Add(nextId, channel);

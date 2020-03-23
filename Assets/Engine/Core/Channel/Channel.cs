@@ -62,13 +62,21 @@ namespace AudioEngine
             state.OnEnterState(this);
         }
 
+        public void Reset()
+        {
+            GameObjectPool.Instance.ReturnToPool(AudioSource.gameObject);
+            AudioSource.clip = null;
+            AudioSource.loop = false;
+            AudioSource = null;
+            EnterState("Empty");
+        }
+        
         public void Update()
         {
             if (_pause)
             {
                 return;
             }
-
             CurentState?.OnStateUpdate();
         }
 
