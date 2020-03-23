@@ -6,6 +6,7 @@
         {
             //todo do some initialize work
             base.OnEnterState(channel);
+            Channel.Loaded = false;
             Channel.EnterState("ToPlay");
         }
     }

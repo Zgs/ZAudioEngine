@@ -14,7 +14,7 @@ namespace AudioEngine
             Channel.AudioSource.clip = null;
             Channel.AudioSource.transform.position = Channel.Position.Value;
             Channel.AudioSource.volume = Channel.Volume;
-            
+            Channel.Loaded = true;
             Channel.EnterState("ToPlay");
         }
     }

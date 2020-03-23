@@ -48,5 +48,10 @@ namespace AudioEngine
             channel.EnterState("Stopping");
             _channelMap.Remove(id);
         }
+
+        public void PauseSound(int id)
+        {
+            
+        }
     }
 }

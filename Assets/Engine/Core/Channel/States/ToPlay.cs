@@ -1,32 +1,30 @@
-﻿using UnityEngine;
-
-namespace AudioEngine
+﻿namespace AudioEngine
 {
     public class ToPlay : State
     {
-        private string _previous;
-
         public override void OnEnterState(Channel channel)
         {
             base.OnEnterState(channel);
-            switch (_previous)
+            if (Channel.ShouldBeVirtual())
             {
-                case "Initialize":
-                    Channel.EnterState("Load");
-                    break;
-                case "Load":
-                    Channel.EnterState("Playing");
-                    break;
-                case "":
-                case null:
-                    Debug.LogWarning("something wrong");
-                    break;
+                if (Channel.OnShot)
+                {
+                    Channel.EnterState("Stopping");
+                }
+                else
+                {
+                    Channel.EnterState("Virtual");
+                }
+                return;
             }
-        }
 
-        public override void OnStateTransfer(State before, State after)
-        {
-            _previous = after == this ? before.Name : string.Empty;
+            if (!Channel.Loaded)
+            {
+                Channel.EnterState("Load");
+                return;
+            }
+
+            Channel.EnterState("Playing");
         }
     }
 }

@@ -22,6 +22,8 @@ namespace AudioEngine
         public string EventName { get; set; }
         public float Volume { get; set; }
         public Vector3? Position { get; set; }
+        public bool OnShot { get; set; }
+        public bool Loaded { get; set; }
 
         /// <summary>
         /// setup the base information for this channel

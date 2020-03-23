@@ -25,6 +25,5 @@ namespace AudioEngine
                 Channel.EnterState("Stopped");
             }
         }
-        
     }
 }
