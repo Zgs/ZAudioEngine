@@ -38,77 +38,76 @@ namespace AudioEngine
             var pool = PoolDict[poolName];
             pool.ReturnToQueue(gameObj);
         }
-    }
 
-
-    public class Pool
-    {
-        private int _availableCount;
-        private readonly string _poolName;
-        private readonly GameObject _poolObj;
-        private readonly GameObject _poolObjRoot;
-        private readonly Queue<GameObject> _queue;
-
-        public Pool(string poolName, GameObject poolObj, int initSize, GameObject rootObj)
+        public class Pool
         {
-            _poolObjRoot = new GameObject(poolName);
-            _poolObjRoot.transform.SetParent(rootObj.transform);
-            _poolName = poolName;
-            _poolObj = poolObj;
-            _queue = new Queue<GameObject>();
-            for (var i = 0; i < initSize; i++)
-            {
-                var gameObject = Object.Instantiate(poolObj, _poolObjRoot.transform, true);
-                gameObject.SetActive(false);
-                gameObject.transform.localPosition = Vector3.zero;
-                _queue.Enqueue(gameObject);
-            }
+            private int _availableCount;
+            private readonly string _poolName;
+            private readonly GameObject _poolObj;
+            private readonly GameObject _poolObjRoot;
+            private readonly Queue<GameObject> _queue;
 
-            _availableCount = initSize;
-        }
-
-        public GameObject GetNextItem()
-        {
-            GameObject ret;
-            if (_availableCount > 0)
+            public Pool(string poolName, GameObject poolObj, int initSize, GameObject rootObj)
             {
-                ret = _queue.Dequeue();
-                _availableCount -= 1;
-                ret.SetActive(true);
-            }
-            else
-            {
-                ret = Object.Instantiate(_poolObj);
-            }
-
-            if (ret)
-            {
-                ret.SetActive(true);
-                var tag = ret.GetComponent<PoolTag>();
-                if (tag == null)
+                _poolObjRoot = new GameObject(poolName);
+                _poolObjRoot.transform.SetParent(rootObj.transform);
+                _poolName = poolName;
+                _poolObj = poolObj;
+                _queue = new Queue<GameObject>();
+                for (var i = 0; i < initSize; i++)
                 {
-                    tag = ret.AddComponent<PoolTag>();
+                    var gameObject = Object.Instantiate(poolObj, _poolObjRoot.transform, true);
+                    gameObject.SetActive(false);
+                    gameObject.transform.localPosition = Vector3.zero;
+                    _queue.Enqueue(gameObject);
                 }
 
-                tag.PoolName = _poolName;
-                ret.transform.SetParent(null);
+                _availableCount = initSize;
             }
 
-            return ret;
+            public GameObject GetNextItem()
+            {
+                GameObject ret;
+                if (_availableCount > 0)
+                {
+                    ret = _queue.Dequeue();
+                    _availableCount -= 1;
+                    ret.SetActive(true);
+                }
+                else
+                {
+                    ret = Instantiate(_poolObj);
+                }
+
+                if (ret)
+                {
+                    ret.SetActive(true);
+                    var tag = ret.GetComponent<PoolTag>();
+                    if (tag == null)
+                    {
+                        tag = ret.AddComponent<PoolTag>();
+                    }
+
+                    tag.PoolName = _poolName;
+                    ret.transform.SetParent(null);
+                }
+
+                return ret;
+            }
+
+            public void ReturnToQueue(GameObject item)
+            {
+                _queue.Enqueue(item);
+                item.transform.SetParent(_poolObjRoot.transform);
+                item.transform.localPosition = Vector3.zero;
+                item.SetActive(false);
+                _availableCount += 1;
+            }
         }
 
-        public void ReturnToQueue(GameObject item)
+        public class PoolTag : MonoBehaviour
         {
-            _queue.Enqueue(item);
-            item.transform.SetParent(_poolObjRoot.transform);
-            item.transform.localPosition = Vector3.zero;
-            item.SetActive(false);
-            _availableCount += 1;
+            public string PoolName;
         }
-    }
-
-    public class PoolTag : MonoBehaviour
-    {
-        public string PoolName;
     }
 }

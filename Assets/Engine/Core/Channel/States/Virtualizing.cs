@@ -21,6 +21,11 @@ namespace AudioEngine
         {
             Channel.Volume = Mathf.Lerp(_startVolume, 0, _passedTime / _gobalFadeoutTime);
             _passedTime += Time.deltaTime;
+            if (Math.Abs(Channel.Volume) < float.Epsilon)
+            {
+                Channel.EnterState("Virtual");
+            }
+
             if (!Channel.ShouldBeVirtual())
             {
                 Channel.EnterState("Playing");

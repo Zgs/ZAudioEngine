@@ -10,8 +10,8 @@
 
         public override void OnStateUpdate()
         {
-            ApplyChannelParameters();
-            if (!Channel.IsPlaying)
+            Channel.ApplyChannelParameters();
+            if (!Channel.AudioSource.isPlaying)
             {
                 Channel.EnterState("Stopping");
             }
@@ -25,11 +25,8 @@
         private void Play()
         {
             //we start to play the sound
-            ApplyChannelParameters();
-        }
-
-        private void ApplyChannelParameters()
-        {
+            Channel.ApplyChannelParameters();
+            Channel.AudioSource.Play();
         }
     }
 }

@@ -8,11 +8,12 @@ namespace AudioEngine
         private readonly Dictionary<int, Channel> _channelMap = new Dictionary<int, Channel>();
         [SerializeField] private GameObject _audioPrefab;
         private int _channelId;
-
+        public ILoader Loader;
 
         private void Start()
         {
             GameObjectPool.Instance.CreatePool("Audio", _audioPrefab, 20);
+            Loader = new ResourcesLoader();
         }
 
         private void Update()
@@ -51,7 +52,6 @@ namespace AudioEngine
 
         public void PauseSound(int id)
         {
-            
         }
     }
 }

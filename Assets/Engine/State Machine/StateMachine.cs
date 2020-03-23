@@ -5,16 +5,16 @@ namespace AudioEngine
     public abstract class StateMachine
     {
         public State CurentState;
-        protected Dictionary<string, State> States = new Dictionary<string, State>();
+        protected readonly Dictionary<string, State> States = new Dictionary<string, State>();
 
-        public void AddState(State state)
+        public void AddState(string stateName, State state)
         {
-            var stateName = typeof(State).Name;
             if (States.ContainsKey(stateName))
             {
                 return;
             }
-            States.Add(typeof(State).Name, state);
+            state.Name = stateName;
+            States.Add(stateName, state);
         }
 
         public abstract void EnterState(string stateName);

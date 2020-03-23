@@ -10,7 +10,7 @@
                 Channel.EnterState("ToPlay");
             }
 
-            if (!Channel.IsPlaying)
+            if (!Channel.AudioSource.isPlaying)
             {
                 Channel.EnterState("Stopping");
             }

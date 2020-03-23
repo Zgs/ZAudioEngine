@@ -7,16 +7,21 @@ namespace AudioEngine
         public bool IsPlaying;
         public AudioSource AudioSource;
 
+        private bool _pause;
+
         public Channel()
         {
-            AddState(new Initialize());
-            AddState(new Load());
-            AddState(new ToPlay());
-            AddState(new Playing());
-            AddState(new Virtualizing());
-            AddState(new Virtual());
-            AddState(new Stopping());
-            AddState(new Stopped());
+            AddState("Initialize", new Initialize());
+            AddState("Empty", new Empty());
+            AddState("Load", new Load());
+            AddState("ToPlay", new ToPlay());
+            AddState("Playing", new Playing());
+            AddState("Virtualizing", new Virtualizing());
+            AddState("Virtual", new Virtual());
+            AddState("Stopping", new Stopping());
+            AddState("Stopped", new Stopped());
+            
+            EnterState("Empty");
         }
 
         public string EventName { get; set; }
@@ -47,23 +52,45 @@ namespace AudioEngine
 
             var previousState = CurentState;
             var state = States[stateName];
-
-            previousState.OnStateExit();
-            previousState.OnStateTransfer(previousState, state);
-            state.OnStateTransfer(previousState, state);
-            state.OnEnterState(this);
-
+            if (previousState != null)
+            {
+                previousState.OnStateExit();
+                previousState.OnStateTransfer(previousState, state);
+                state.OnStateTransfer(previousState, state);
+            }
             CurentState = state;
+            state.OnEnterState(this);
         }
 
         public void Update()
         {
+            if (_pause)
+            {
+                return;
+            }
+
             CurentState?.OnStateUpdate();
         }
 
         public bool ShouldBeVirtual()
         {
             return false;
+        }
+
+        public void ApplyChannelParameters()
+        {
+        }
+
+        public void Pause()
+        {
+            AudioSource.Pause();
+            _pause = true;
+        }
+
+        public void UnPause()
+        {
+            AudioSource.UnPause();
+            _pause = false;
         }
     }
 }

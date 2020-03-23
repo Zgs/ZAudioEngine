@@ -9,8 +9,11 @@
             base.OnEnterState(channel);
             // do some reset work and release all resources the channel used
             Channel.AudioSource.clip = null;
-            channel.AudioSource.loop = false;
+            Channel.AudioSource.loop = false;
+            Channel.AudioSource.Stop();
             GameObjectPool.Instance.ReturnToPool(Channel.AudioSource.gameObject);
+            Channel.AudioSource = null;
+            Channel.EnterState("Empty");
         }
     }
 }
