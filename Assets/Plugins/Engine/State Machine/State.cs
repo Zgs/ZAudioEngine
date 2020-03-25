@@ -10,12 +10,16 @@ namespace AudioEngine
         public virtual void OnEnterState(Channel channel)
         {
             Channel = channel;
+#if UNITY_EDITOR
             Debug.Log($"enter {Name}");
+#endif
         }
 
         public virtual void OnStateExit()
         {
+#if UNITY_EDITOR
             Debug.Log($"exit {Name}");
+#endif
         }
 
         /// <summary>
@@ -25,7 +29,9 @@ namespace AudioEngine
         /// <param name="after"></param>
         public virtual void OnStateTransfer(State before, State after)
         {
+#if UNITY_EDITOR
             Debug.Log($"from {before.Name} to {after.Name}");
+#endif
         }
 
         public virtual void OnStateUpdate()

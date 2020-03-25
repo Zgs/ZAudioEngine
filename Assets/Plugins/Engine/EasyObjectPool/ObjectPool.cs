@@ -5,20 +5,9 @@ public class ObjectPool
 {
     private static ObjectPool _instance;
 
-    public static ObjectPool Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = new ObjectPool();
-            }
+    public static ObjectPool Instance => _instance ?? (_instance = new ObjectPool());
 
-            return _instance;
-        }
-    }
-
-    private Dictionary<string, Queue<object>> _poolDict = new Dictionary<string, Queue<object>>();
+    private readonly Dictionary<string, Queue<object>> _poolDict = new Dictionary<string, Queue<object>>();
 
     public void CreatePool<T>(int initSize) where T : new()
     {
