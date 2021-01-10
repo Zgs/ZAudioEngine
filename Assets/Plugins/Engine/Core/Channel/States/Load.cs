@@ -4,24 +4,24 @@ namespace AudioEngine
 {
     public class Load : State
     {
-        public override void OnEnterState(Channel channel)
+        public override void OnEnterState(AudioEvent audioEvent)
         {
-            base.OnEnterState(channel);
+            base.OnEnterState(audioEvent);
             //now it is sync when in real project it should be an async way
-            Channel = channel;
-            Channel.AudioSource = GameObjectPool.Instance.GetNext("Audio").GetComponent<AudioSource>();
-            Channel.AudioSource.spatialBlend = Channel.Position == null ? 0f : 1f;
-            Channel.AudioSource.transform.position = Channel.Position ?? Vector3.zero;
-            Channel.AudioSource.volume = Channel.Volume;
-            Channel.AudioSource.playOnAwake = false;
+            AudioEvent = audioEvent;
+            AudioEvent.AudioSource = GameObjectPool.Instance.GetNext("Audio").GetComponent<AudioSource>();
+            AudioEvent.AudioSource.spatialBlend = AudioEvent.Position == null ? 0f : 1f;
+            AudioEvent.AudioSource.transform.position = AudioEvent.Position ?? Vector3.zero;
+            AudioEvent.AudioSource.volume = AudioEvent.Volume;
+            AudioEvent.AudioSource.playOnAwake = false;
 
-            var request = AudioEngine.Instance.Loader.LoadAsyncWithCallBack<AudioClip>(Channel.EventName);
+            var request = AudioEngine.Instance.Loader.LoadAsyncWithCallBack<AudioClip>(AudioEvent.EventName);
             request.completed += operation =>
             {
                 var clip = request.asset as AudioClip;
-                Channel.AudioSource.clip = clip;
-                Channel.Loaded = true;
-                Channel.EnterState("ToPlay");
+                AudioEvent.AudioSource.clip = clip;
+                AudioEvent.Loaded = true;
+                AudioEvent.EnterState("ToPlay");
             };
         }
     }

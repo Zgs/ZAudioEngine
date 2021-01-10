@@ -2,29 +2,29 @@
 {
     public class ToPlay : State
     {
-        public override void OnEnterState(Channel channel)
+        public override void OnEnterState(AudioEvent audioEvent)
         {
-            base.OnEnterState(channel);
-            if (Channel.ShouldBeVirtual())
+            base.OnEnterState(audioEvent);
+            if (AudioEvent.ShouldBeVirtual())
             {
-                if (Channel.OnShot)
+                if (AudioEvent.OnShot)
                 {
-                    Channel.EnterState("Stopping");
+                    AudioEvent.EnterState("Stopping");
                 }
                 else
                 {
-                    Channel.EnterState("Virtual");
+                    AudioEvent.EnterState("Virtual");
                 }
                 return;
             }
 
-            if (!Channel.Loaded)
+            if (!AudioEvent.Loaded)
             {
-                Channel.EnterState("Load");
+                AudioEvent.EnterState("Load");
                 return;
             }
 
-            Channel.EnterState("Playing");
+            AudioEvent.EnterState("Playing");
         }
     }
 }

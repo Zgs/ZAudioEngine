@@ -2,12 +2,12 @@
 {
     public class Initialize : State
     {
-        public override void OnEnterState(Channel channel)
+        public override void OnEnterState(AudioEvent audioEvent)
         {
             //todo do some initialize work
-            base.OnEnterState(channel);
-            Channel.Loaded = false;
-            Channel.EnterState("ToPlay");
+            base.OnEnterState(audioEvent);
+            AudioEvent.Loaded = false;
+            AudioEvent.EnterState("ToPlay");
         }
     }
 }

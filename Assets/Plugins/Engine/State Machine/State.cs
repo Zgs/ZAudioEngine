@@ -4,12 +4,12 @@ namespace AudioEngine
 {
     public class State
     {
-        protected Channel Channel;
+        protected AudioEvent AudioEvent;
         public string Name;
 
-        public virtual void OnEnterState(Channel channel)
+        public virtual void OnEnterState(AudioEvent audioEvent)
         {
-            Channel = channel;
+            AudioEvent = audioEvent;
 #if UNITY_EDITOR
             Debug.Log($"enter {Name}");
 #endif

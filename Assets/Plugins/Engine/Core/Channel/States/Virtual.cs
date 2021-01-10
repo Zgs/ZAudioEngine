@@ -5,14 +5,14 @@
         public override void OnStateUpdate()
         {
             base.OnStateUpdate();
-            if (!Channel.ShouldBeVirtual())
+            if (!AudioEvent.ShouldBeVirtual())
             {
-                Channel.EnterState("ToPlay");
+                AudioEvent.EnterState("ToPlay");
             }
 
-            if (!Channel.AudioSource.isPlaying)
+            if (!AudioEvent.AudioSource.isPlaying)
             {
-                Channel.EnterState("Stopping");
+                AudioEvent.EnterState("Stopping");
             }
         }
     }

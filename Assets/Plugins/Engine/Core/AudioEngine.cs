@@ -7,45 +7,45 @@ namespace AudioEngine
     public class AudioEngine : SingletonMono<AudioEngine>
     {
         [SerializeField] private GameObject _audioPrefab;
-        private int _channelId;
+        private int _audioId;
         public ILoader Loader { get; private set; }
 
         [NonSerialized]
-        internal readonly Dictionary<string, List<Channel>> Channels = new Dictionary<string, List<Channel>>();
+        internal readonly Dictionary<string, List<AudioEvent>> Channels = new Dictionary<string, List<AudioEvent>>();
 
-        [NonSerialized] public readonly Dictionary<int, Channel> ChannelMap = new Dictionary<int, Channel>();
+        [NonSerialized] public readonly Dictionary<int, AudioEvent> Events = new Dictionary<int, AudioEvent>();
 
         private void Start()
         {
             GameObjectPool.Instance.CreatePool("Audio", _audioPrefab, 20);
-            ObjectPool.Instance.CreatePool<Channel>(20);
+            ObjectPool.Instance.CreatePool<AudioEvent>(20);
             Loader = new ResourcesLoader();
         }
 
         private void Update()
         {
-            var keys = ChannelMap.Keys;
+            var keys = Events.Keys;
             foreach (var key in keys)
             {
-                var channel = ChannelMap[key];
+                var channel = Events[key];
                 channel.Update();
             }
         }
 
         public int PlaySound(string eventName, Vector3? pos)
         {
-            var nextId = _channelId++;
-            var channel = ObjectPool.Instance.GetNext<Channel>();
+            var nextId = _audioId++;
+            var channel = ObjectPool.Instance.GetNext<AudioEvent>();
             channel.Setup(eventName, pos, 1, nextId);
             channel.EnterState("Initialize");
-            ChannelMap.Add(nextId, channel);
+            Events.Add(nextId, channel);
             if (Channels.ContainsKey(eventName))
             {
                 Channels[eventName].Add(channel);
             }
             else
             {
-                var list = new List<Channel> {channel};
+                var list = new List<AudioEvent> {channel};
                 Channels.Add(eventName, list);
             }
 
@@ -54,7 +54,7 @@ namespace AudioEngine
 
         public void StopSound(int id)
         {
-            if (ChannelMap.TryGetValue(id, out var channel))
+            if (Events.TryGetValue(id, out var channel))
             {
                 channel.EnterState("Stopping");
             }
@@ -62,7 +62,7 @@ namespace AudioEngine
 
         public void PauseSound(int id)
         {
-            if (ChannelMap.TryGetValue(id, out var channel))
+            if (Events.TryGetValue(id, out var channel))
             {
                 channel.Pause();
             }
@@ -70,7 +70,7 @@ namespace AudioEngine
 
         public void UnpauseSound(int id)
         {
-            if (ChannelMap.TryGetValue(id, out var channel))
+            if (Events.TryGetValue(id, out var channel))
             {
                 channel.UnPause();
             }

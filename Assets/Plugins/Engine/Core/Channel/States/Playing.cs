@@ -2,31 +2,31 @@
 {
     public class Playing : State
     {
-        public override void OnEnterState(Channel channel)
+        public override void OnEnterState(AudioEvent audioEvent)
         {
-            base.OnEnterState(channel);
+            base.OnEnterState(audioEvent);
             Play();
         }
 
         public override void OnStateUpdate()
         {
-            Channel.ApplyChannelParameters();
-            if (!Channel.AudioSource.isPlaying)
+            AudioEvent.ApplyChannelParameters();
+            if (!AudioEvent.AudioSource.isPlaying)
             {
-                Channel.EnterState("Stopping");
+                AudioEvent.EnterState("Stopping");
             }
 
-            if (Channel.ShouldBeVirtual())
+            if (AudioEvent.ShouldBeVirtual())
             {
-                Channel.EnterState("Virtualizing");
+                AudioEvent.EnterState("Virtualizing");
             }
         }
 
         private void Play()
         {
             //we start to play the sound
-            Channel.ApplyChannelParameters();
-            Channel.AudioSource.Play();
+            AudioEvent.ApplyChannelParameters();
+            AudioEvent.AudioSource.Play();
         }
     }
 }

@@ -2,16 +2,16 @@
 {
     public class Stopped : State
     {
-        private Channel _channel;
+        private AudioEvent _audioEvent;
 
-        public override void OnEnterState(Channel channel)
+        public override void OnEnterState(AudioEvent audioEvent)
         {
-            base.OnEnterState(channel);
+            base.OnEnterState(audioEvent);
             
             // do some reset work and release all resources the channel used
-            Channel.AudioSource.Stop();
-            Channel.Reset();
-            ObjectPool.Instance.ReturnToPool(Channel);
+            AudioEvent.AudioSource.Stop();
+            AudioEvent.Reset();
+            ObjectPool.Instance.ReturnToPool(AudioEvent);
         }
     }
 }

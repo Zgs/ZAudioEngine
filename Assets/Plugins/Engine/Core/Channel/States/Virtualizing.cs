@@ -10,25 +10,25 @@ namespace AudioEngine
         private float _startVolume;
         private readonly float _gobalFadeoutTime = 0.3f;
 
-        public override void OnEnterState(Channel channel)
+        public override void OnEnterState(AudioEvent audioEvent)
         {
-            base.OnEnterState(channel);
+            base.OnEnterState(audioEvent);
             _passedTime = 0;
-            _startVolume = Channel.Volume;
+            _startVolume = AudioEvent.Volume;
         }
 
         public override void OnStateUpdate()
         {
-            Channel.Volume = Mathf.Lerp(_startVolume, 0, _passedTime / _gobalFadeoutTime);
+            AudioEvent.Volume = Mathf.Lerp(_startVolume, 0, _passedTime / _gobalFadeoutTime);
             _passedTime += Time.deltaTime;
-            if (Math.Abs(Channel.Volume) < float.Epsilon)
+            if (Math.Abs(AudioEvent.Volume) < float.Epsilon)
             {
-                Channel.EnterState("Virtual");
+                AudioEvent.EnterState("Virtual");
             }
 
-            if (!Channel.ShouldBeVirtual())
+            if (!AudioEvent.ShouldBeVirtual())
             {
-                Channel.EnterState("Playing");
+                AudioEvent.EnterState("Playing");
             }
         }
 

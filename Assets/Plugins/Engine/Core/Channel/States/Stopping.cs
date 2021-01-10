@@ -10,28 +10,28 @@ namespace AudioEngine
         private int _state;
         private float _passedTime;
         private float _startVolume;
-        public override void OnEnterState(Channel channel)
+        public override void OnEnterState(AudioEvent audioEvent)
         {
-            base.OnEnterState(channel);
+            base.OnEnterState(audioEvent);
             _passedTime = 0;
-            _startVolume = Channel.Volume;
+            _startVolume = AudioEvent.Volume;
             
-            var list = _engine.Channels[channel.EventName];
-            list.Remove(channel);
+            var list = _engine.Channels[audioEvent.EventName];
+            list.Remove(audioEvent);
             if (list.Count < 1)
             {
-                _engine.Channels.Remove(channel.EventName);
+                _engine.Channels.Remove(audioEvent.EventName);
             }
-            _engine.ChannelMap.Remove(channel.Id);
+            _engine.Events.Remove(audioEvent.Id);
         }
 
         public override void OnStateUpdate()
         {
-            Channel.Volume = Mathf.Lerp(_startVolume, 0, _passedTime / GobalFadeoutTime);
+            AudioEvent.Volume = Mathf.Lerp(_startVolume, 0, _passedTime / GobalFadeoutTime);
             _passedTime += Time.deltaTime;
-            if (Math.Abs(Channel.Volume) < float.Epsilon)
+            if (Math.Abs(AudioEvent.Volume) < float.Epsilon)
             {
-                Channel.EnterState("Stopped");
+                AudioEvent.EnterState("Stopped");
             }
         }
     }
